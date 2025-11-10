@@ -1,0 +1,27 @@
+{
+  "name": "@gmao/ui",
+  "version": "1.0.0",
+  "description": "GMAO Shared UI Components",
+  "private": true,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "dev": "tsc --watch",
+    "build": "tsc",
+    "test": "vitest",
+    "lint": "eslint src --ext .ts,.tsx --report-unused-disable-directives --max-warnings 0",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist node_modules"
+  },
+  "dependencies": {
+    "@gmao/shared": "workspace:*",
+    "@headlessui/react": "^2.0.0",
+    "clsx": "^2.0.0",
+    "react": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.43",
+    "typescript": "^5.3.0",
+    "vitest": "^1.0.0"
+  }
+}

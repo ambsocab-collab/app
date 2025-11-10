@@ -2573,6 +2573,229 @@ jobs:
 | Staging | gmaoapp-staging.vercel.app | gmao-api-staging.up.railway.app | Pre-production testing |
 | Production | gmaoapp.vercel.app | gmao-api.up.railway.app | Live environment |
 
+### Detailed Environment Setup
+
+#### **Development Environment Setup**
+
+**Prerequisites:**
+```bash
+# Node.js 18+ required
+node --version  # Should be 18.x or higher
+
+# pnpm package manager
+npm install -g pnpm
+
+# Git for version control
+git --version
+```
+
+**Step-by-Step Setup:**
+
+1. **Clone Repository**
+```bash
+git clone <repository-url>
+cd gmaoapp
+```
+
+2. **Install Dependencies**
+```bash
+# Install all workspace dependencies
+pnpm install
+
+# This installs dependencies for root, apps/web, apps/api, and packages/shared
+```
+
+3. **Environment Configuration**
+```bash
+# Copy environment templates
+cp .env.example .env.local
+cp apps/web/.env.example apps/web/.env.local
+cp apps/api/.env.example apps/api/.env.local
+```
+
+4. **Supabase Setup**
+```bash
+# Login to Supabase CLI (requires account)
+pnpm supabase login
+
+# Link to project (project settings > API > URL + anon key)
+pnpm supabase link --project-ref <your-project-ref>
+
+# Start local Supabase development
+pnpm supabase start
+```
+
+5. **Database Setup**
+```bash
+# Apply migrations to local database
+pnpm supabase db push
+
+# Seed development data
+pnpm run seed:dev
+```
+
+6. **Start Development Servers**
+```bash
+# Start both frontend and backend in parallel
+pnpm dev
+
+# Or start individually:
+pnpm --filter web dev    # Frontend on localhost:3000
+pnpm --filter api dev    # Backend on localhost:3001
+```
+
+#### **Required Environment Variables**
+
+**Frontend (.env.local):**
+```bash
+# Supabase Configuration
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
+
+# API Configuration
+NEXT_PUBLIC_API_URL=http://localhost:3001
+NEXT_PUBLIC_APP_NAME=GMAOapp
+
+# Optional: Feature flags
+NEXT_PUBLIC_ENABLE_PWA=true
+NEXT_PUBLIC_ENABLE_ANALYTICS=false  # Disable in development
+```
+
+**Backend (.env.local):**
+```bash
+# Supabase Configuration
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key-here
+SUPABASE_DB_URL=postgresql://postgres:[password]@localhost:54322/postgres
+
+# Server Configuration
+PORT=3001
+NODE_ENV=development
+JWT_SECRET=your-jwt-secret-here
+
+# CORS Configuration (for development)
+CORS_ORIGIN=http://localhost:3000
+```
+
+#### **Production Environment Setup**
+
+**Vercel (Frontend) Setup:**
+
+1. **Connect Repository**
+   - Login to Vercel dashboard
+   - Import GitHub repository
+   - Select `apps/web` as root directory
+
+2. **Environment Variables**
+   ```bash
+   # Add these in Vercel dashboard > Settings > Environment Variables
+   NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-prod-anon-key
+   NEXT_PUBLIC_API_URL=https://gmao-api.up.railway.app
+   NEXT_PUBLIC_APP_NAME=GMAOapp
+   ```
+
+3. **Build Configuration**
+   - **Build Command:** `pnpm --filter web build`
+   - **Output Directory:** `apps/web/dist`
+   - **Install Command:** `pnpm install`
+
+4. **Deploy**
+   - Connect `main` branch to production
+   - Enable automatic deployments on push to main
+
+**Railway (Backend) Setup:**
+
+1. **Create New Service**
+   - Login to Railway dashboard
+   - Deploy from GitHub repository
+   - Select `apps/api` as root directory
+
+2. **Environment Variables**
+   ```bash
+   # Add these in Railway dashboard > Variables
+   SUPABASE_URL=https://your-project.supabase.co
+   SUPABASE_SERVICE_ROLE_KEY=your-prod-service-key
+   SUPABASE_DB_URL=postgresql://postgres:[password]@db.your-project.railway.app:5432/postgres
+   NODE_ENV=production
+   JWT_SECRET=your-prod-jwt-secret
+   CORS_ORIGIN=https://gmaoapp.vercel.app
+   ```
+
+3. **Build Configuration**
+   - **Build Command:** `pnpm --filter api build`
+   - **Start Command:** `pnpm --filter api start`
+   - **Healthcheck Path:** `/api/v1/health`
+
+4. **Deploy**
+   - Connect `main` branch to production
+   - Railway will automatically deploy on push
+
+#### **Database Migration to Production**
+
+1. **Backup Local Development Data**
+```bash
+# Export local data (optional)
+pnpm supabase db dump > dev-backup.sql
+```
+
+2. **Deploy Migrations to Production**
+```bash
+# Ensure remote is set to production
+pnpm supabase link --project-ref <your-prod-project-ref>
+
+# Push migrations to production database
+pnpm supabase db push
+
+# Seed production data (admin users, basic equipment)
+pnpm run seed:prod
+```
+
+3. **Verify Production Database**
+```sql
+-- Check tables exist
+SELECT table_name FROM information_schema.tables
+WHERE table_schema = 'public';
+
+-- Check RLS policies enabled
+SELECT tablename, rowsecurity FROM pg_tables
+WHERE schemaname = 'public';
+```
+
+#### **Troubleshooting Common Issues**
+
+**Development Issues:**
+```bash
+# If ports conflict, check what's running
+netstat -tulpn | grep :3000
+netstat -tulpn | grep :3001
+
+# If dependencies fail, clean install
+rm -rf node_modules pnpm-lock.yaml
+pnpm install
+
+# If Supabase connection fails, check local instance
+pnpm supabase status
+```
+
+**Deployment Issues:**
+```bash
+# Check build logs in Vercel/Railway dashboards
+# Verify environment variables match exactly
+# Ensure CORS origins are correctly configured
+```
+
+**Database Issues:**
+```bash
+# Reset local database if needed
+pnpm supabase db reset
+pnpm supabase db push
+pnpm run seed:dev
+
+# Check migration status
+pnpm supabase migration list
+```
+
 ---
 
 ## Security and Performance
@@ -3117,6 +3340,92 @@ The full-stack architecture for GMAOapp has been successfully designed and docum
 The architecture comprehensively addresses all PRD requirements with detailed technical specifications, clear implementation guidance, and realistic development pathways. The remaining 5 points represent potential optimizations that can be addressed during development iterations rather than blocking the MVP delivery.
 
 This architecture provides a solid foundation for delivering a functional industrial maintenance system within the specified constraints while establishing clear pathways for future enhancement and scaling.
+
+---
+
+## Cross-Story Dependencies
+
+### Story Implementation Sequencing
+
+This section defines the dependencies and coordination requirements between stories in Epic 1: Foundation & Authentication to prevent conflicts and ensure smooth parallel development.
+
+### Dependency Matrix
+
+| Story | Must Complete Before | Can Develop In Parallel With | Dependencies |
+|-------|---------------------|-----------------------------|--------------|
+| **1.1 Repository Setup** | All other stories | None | Git repo structure, package.json setup |
+| **1.2 Frontend Infrastructure** | 1.3 (for API proxy) | 1.4, 1.5 | Monorepo structure, build tools |
+| **1.3 Backend Infrastructure** | 1.1 | 1.2, 1.4, 1.5 | Database setup, API structure |
+| **1.4 Testing Infrastructure** | 1.1 | 1.2, 1.3, 1.5 | Test framework setup |
+| **1.5 Authentication Foundation** | 1.3, 1.2 | 1.4 | Backend API, Frontend components |
+
+### Coordination Points
+
+#### **Before Starting Development:**
+1. **Story 1.1 must be completed first** - establishes repository structure
+2. **Environment variable standards** must be agreed upon across all stories
+3. **Shared types package** structure defined in Story 1.1 affects all subsequent stories
+
+#### **Parallel Development Coordination:**
+1. **API Contract Agreement** (Stories 1.2 & 1.3):
+   - Backend team defines API endpoints in Story 1.3
+   - Frontend team creates service layer in Story 1.2
+   - Must coordinate on endpoint naming, request/response formats
+
+2. **Database Schema Coordination** (Stories 1.3 & 1.5):
+   - Story 1.3 creates basic schema
+   - Story 1.5 adds authentication tables and RLS policies
+   - Must coordinate on user table structure and relationships
+
+3. **Component Testing Strategy** (Stories 1.2 & 1.4):
+   - Story 1.2 creates components
+   - Story 1.4 sets up testing framework
+   - Must agree on component testing patterns and utilities
+
+#### **Integration Dependencies:**
+1. **Frontend-Backend Integration** (Stories 1.2 & 1.3):
+   - API proxy configuration in Vite (1.2) depends on backend server setup (1.3)
+   - Environment variables for API URLs must be consistent
+
+2. **Authentication Integration** (Stories 1.2, 1.3, 1.5):
+   - Frontend auth components (1.2) depend on auth middleware (1.3) and auth services (1.5)
+   - JWT token handling must be consistent across all stories
+
+3. **Testing Integration** (Story 1.4 with all others):
+   - Test database setup in 1.4 must match schema from 1.3 and 1.5
+   - Component testing utilities in 1.4 must work with components from 1.2
+
+### Communication Protocols
+
+#### **Daily Coordination:**
+- **Frontend Team** (Stories 1.2, 1.5): API endpoint usage, component requirements
+- **Backend Team** (Stories 1.3, 1.5): Schema changes, auth endpoints
+- **Testing Team** (Story 1.4): Test environment needs, component testing patterns
+
+#### **Critical Review Points:**
+1. **After Story 1.1 Complete:** Review repository structure before parallel development
+2. **API Contract Review:** Before frontend-backend integration work
+3. **Schema Review:** Before implementing authentication (1.5)
+4. **Integration Testing:** Before any story marks as "Ready for QA"
+
+### Branch Management Strategy
+
+#### **Feature Branches:**
+- `feature/story-1.1-repo-setup` (completed first)
+- `feature/story-1.2-frontend`
+- `feature/story-1.3-backend`
+- `feature/story-1.4-testing`
+- `feature/story-1.5-auth`
+
+#### **Integration Branch:**
+- `develop` - integration point for all Epic 1 stories
+- Regular merges from feature branches to test integration
+- No direct merges to `main` until Epic 1 complete
+
+#### **Coordination Commits:**
+- Shared types package updates coordinated across all branches
+- Environment variable changes require coordinated commits
+- API contract changes tagged in commit messages for easy tracking
 
 ---
 
