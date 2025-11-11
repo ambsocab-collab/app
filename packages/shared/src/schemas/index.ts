@@ -81,6 +81,12 @@ export const PaginatedResponseSchema = z.object({
   })
 })
 
+// Test schema for testing purposes
+export const testSchema = z.object({
+  id: z.string(),
+  name: z.string()
+})
+
 // Query parameter schemas
 export const PaginationQuerySchema = z.object({
   page: z.string().transform(Number).pipe(z.number().min(1).default(1)),

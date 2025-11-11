@@ -7,7 +7,7 @@ module.exports = {
   },
   extends: [
     'eslint:recommended',
-    '@typescript-eslint/recommended',
+    'plugin:@typescript-eslint/recommended',
   ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
@@ -25,8 +25,7 @@ module.exports = {
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'warn',
     '@typescript-eslint/no-non-null-assertion': 'warn',
-    '@typescript-eslint/prefer-const': 'error',
-
+    
     // General rules
     'no-console': 'warn',
     'no-debugger': 'error',
@@ -43,7 +42,9 @@ module.exports = {
       files: ['**/*.test.ts', '**/*.test.tsx', '**/*.spec.ts', '**/*.spec.tsx'],
       env: {
         jest: true,
-        vitest: true,
+      },
+      globals: {
+        vi: 'readonly',
       },
       rules: {
         '@typescript-eslint/no-explicit-any': 'off',

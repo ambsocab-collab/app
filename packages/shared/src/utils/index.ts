@@ -5,6 +5,11 @@ export function cn(...inputs: ClassValue[]) {
   return clsx(inputs)
 }
 
+// Test export function
+export function testExport(): string {
+  return 'test function export'
+}
+
 // Date formatting utilities
 export function formatDate(date: string | Date): string {
   const d = new Date(date)
@@ -33,7 +38,7 @@ export function isValidEmail(email: string): boolean {
 }
 
 export function isValidPhoneNumber(phone: string): boolean {
-  const phoneRegex = /^\+?[\d\s\-\(\)]+$/
+  const phoneRegex = /^\+?[\d\s\-()]+$/
   return phoneRegex.test(phone) && phone.replace(/\D/g, '').length >= 10
 }
 
@@ -48,5 +53,5 @@ export function slugify(text: string): string {
 
 export function truncateText(text: string, maxLength: number): string {
   if (text.length <= maxLength) return text
-  return text.slice(0, maxLength).trim() + '...'
+  return `${text.slice(0, maxLength).trim()  }...`
 }

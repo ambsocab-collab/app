@@ -1,5 +1,5 @@
 // Core application types
-export interface User {
+export type User = {
   id: string
   email: string
   name: string
@@ -8,7 +8,13 @@ export interface User {
   updated_at: string
 }
 
-export interface Equipment {
+// Runtime type markers for testing
+export const UserMarker = 'User' as const
+export const EquipmentMarker = 'Equipment' as const
+export const WorkOrderMarker = 'WorkOrder' as const
+export const TestTypeMarker = 'TestType' as const
+
+export type Equipment = {
   id: string
   name: string
   model: string
@@ -20,7 +26,7 @@ export interface Equipment {
   updated_at: string
 }
 
-export interface WorkOrder {
+export type WorkOrder = {
   id: string
   title: string
   description: string
@@ -34,8 +40,14 @@ export interface WorkOrder {
   completed_at?: string
 }
 
+// Test type for testing purposes
+export type TestType = {
+  id: string
+  name: string
+}
+
 // API Response types
-export interface ApiResponse<T = any> {
+export type ApiResponse<T = unknown> = {
   success: boolean
   data?: T
   error?: string
@@ -43,7 +55,7 @@ export interface ApiResponse<T = any> {
 }
 
 // Pagination types
-export interface PaginatedResponse<T> {
+export type PaginatedResponse<T> = {
   data: T[]
   pagination: {
     page: number

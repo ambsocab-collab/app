@@ -1,4 +1,3 @@
-import { Routes, Route } from 'react-router-dom'
 import { cn } from '@shared/utils'
 
 function App() {
