@@ -46,7 +46,16 @@
       "Bash(pnpm --filter api add:*)",
       "Bash(pnpm --filter api type-check:*)",
       "Bash(npx supabase start:*)",
-      "Bash(pnpm dev)"
+      "Bash(pnpm dev)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(taskkill:*)",
+      "Bash(dir:*)",
+      "Bash(npx supabase db reset:*)",
+      "Bash(curl:*)",
+      "Bash(tasklist:*)",
+      "Bash(git commit:*)",
+      "Bash(PORT=3002 pnpm dev:*)"
     ],
     "deny": [],
     "ask": []
