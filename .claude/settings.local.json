@@ -55,7 +55,8 @@
       "Bash(curl:*)",
       "Bash(tasklist:*)",
       "Bash(git commit:*)",
-      "Bash(PORT=3002 pnpm dev:*)"
+      "Bash(PORT=3002 pnpm dev:*)",
+      "Bash(touch:*)"
     ],
     "deny": [],
     "ask": []
